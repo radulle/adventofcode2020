@@ -1,5 +1,4 @@
-const intOp = function (data, input) {
-  let output
+const intCode = function* (data, input = []) {
   let i = 0
   const op = (n) => {
     const arr = [
@@ -28,11 +27,16 @@ const intOp = function (data, input) {
         i += 4
         break
       case 3: // input
-        data[res2()] = input
+        while (!input.length) {
+          const y = yield
+          if (y !== undefined) input.push(y)
+        }
+        data[res2()] = input.shift()
         i += 2
         break
       case 4: // output
-        output = el1()
+        const y = yield el1()
+        if (y !== undefined) input.push(y)
         i += 2
         break
       case 5: // jump to if true (not zero)
@@ -42,7 +46,7 @@ const intOp = function (data, input) {
           i += 3
         }
         break
-      case 6: // jum to if false (zero)
+      case 6: // jump to if false (zero)
         if (el1() === 0) {
           i = el2()
         } else {
@@ -66,10 +70,26 @@ const intOp = function (data, input) {
         i += 4
         break
       default:
-        break
+        throw new Error("Wrong opCode")
     }
   }
-  return output
 }
 
-module.exports = intOp
+function amplifiers(code, phases, input = []) {
+  const amps = phases.map((phase) => intCode(code(), [phase]))
+  const states = amps.map((amp) => amp.next().done)
+  while (states.some((e) => !e)) {
+    amps.forEach((amp, idx) => {
+      const { value, done } = amp.next(input[input.length - 1])
+      input.push(value)
+      states[idx] = done
+    })
+  }
+  return input.filter((e) => !!e).sort((a, b) => b - a)[0]
+}
+
+intCode.eval = (code, input) => [...intCode(code, input)].slice(-1)[0]
+
+intCode.amplifiers = amplifiers
+
+module.exports = intCode
