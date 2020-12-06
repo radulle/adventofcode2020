@@ -1,5 +1,4 @@
 const fs = require("fs")
-const intCode = require("../intCode")
 
 global.console.infoTime = (logMe) => {
   console.time()
