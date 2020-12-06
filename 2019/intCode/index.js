@@ -1,5 +1,7 @@
+const log = false
 const intCode = function* (data, input = []) {
   let i = 0
+  let base = 0
   const op = (n) => {
     const arr = [
       data[i] % 100,
@@ -12,11 +14,30 @@ const intCode = function* (data, input = []) {
     if (n === 3) return arr[3]
     return arr[0]
   }
-  const el1 = () => (op(1) ? data[i + 1] : data[data[i + 1]])
-  const el2 = () => (op(2) ? data[i + 2] : data[data[i + 2]])
-  const res4 = () => data[i + 3]
-  const res2 = () => data[i + 1]
+  const el1 = () =>
+    op(1) === 1
+      ? data[i + 1]
+      : op(1) === 2
+      ? data[base + data[i + 1]]
+      : data[data[i + 1]]
+  const el2 = () =>
+    op(2) === 1
+      ? data[i + 2]
+      : op(2) === 2
+      ? data[base + data[i + 2]]
+      : data[data[i + 2]]
+  const res4 = () => data[i + 3] + (op(3) ? base : 0)
+  const res2 = () => data[i + 1] + (op(1) ? base : 0)
   while (op() !== 99 && op() !== undefined) {
+    if (log)
+      console.info({
+        i,
+        data: [data[i], data[i + 1], data[i + 2], data[i + 3]],
+        op: [op(), op(1), op(2), op(3)],
+        el: [el1(), el2()],
+        res: [res2(), res4()],
+        base,
+      })
     switch (op()) {
       case 1: // add
         data[res4()] = el1() + el2()
@@ -68,6 +89,10 @@ const intCode = function* (data, input = []) {
           data[res4()] = 0
         }
         i += 4
+        break
+      case 9: // modify relative base
+        base = base + el1()
+        i += 2
         break
       default:
         throw new Error("Wrong opCode")

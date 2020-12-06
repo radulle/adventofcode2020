@@ -147,4 +147,49 @@ describe("IntCode computer", () => {
       )
     })
   })
+
+  describe("Task 2019/09", () => {
+    describe("Tests", () => {
+      it("09a: Quine (program never finishes)", () => {
+        const code = () =>
+          parse("109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99")
+        const generator = intCode(code(), [])
+        expect(
+          code()
+            .map((e) => e === generator.next().value)
+            .every((e) => e)
+        ).toBe(true)
+      })
+
+      it("09a: return 16 digits number", () => {
+        expect(
+          intCode
+            .eval(parse("1102,34915192,34915192,7,4,7,99,0"), [])
+            .toString().length
+        ).toEqual(16)
+      })
+
+      it("09a: returns big number", () => {
+        expect(intCode.eval(parse("104,1125899906842624,99"), [])).toEqual(
+          1125899906842624
+        )
+      })
+    })
+    describe("Tasks", () => {
+      const code = () =>
+        fs
+          .readFileSync(
+            __dirname.split("\\").slice(0, -1).join("/") + "/09/data.txt",
+            "utf8"
+          )
+          .split(",")
+          .map(Number)
+      it("05a: for input 1 output is 3546494377", () => {
+        expect(intCode.eval(code(), [1])).toEqual(3546494377)
+      })
+      it("05b: for input 2 output is 47253", () => {
+        expect(intCode.eval(code(), [2])).toEqual(47253)
+      })
+    })
+  })
 })
