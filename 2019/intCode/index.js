@@ -1,5 +1,5 @@
 const log = false
-const intCode = function* (data, input = []) {
+const intCode = function* (data, input = [], buffer = true) {
   let i = 0
   let base = 0
   const op = (n) => {
@@ -57,7 +57,7 @@ const intCode = function* (data, input = []) {
         break
       case 4: // output
         const y = yield el1()
-        if (y !== undefined) input.push(y)
+        if (y !== undefined && buffer) input.push(y)
         i += 2
         break
       case 5: // jump to if true (not zero)
@@ -101,7 +101,7 @@ const intCode = function* (data, input = []) {
 }
 
 function amplifiers(code, phases, input = []) {
-  const amps = phases.map((phase) => intCode(code(), [phase]))
+  const amps = phases.map((phase) => intCode(code(), [phase], true))
   const states = amps.map((amp) => amp.next().done)
   while (states.some((e) => !e)) {
     amps.forEach((amp, idx) => {
@@ -113,7 +113,8 @@ function amplifiers(code, phases, input = []) {
   return input.filter((e) => !!e).sort((a, b) => b - a)[0]
 }
 
-intCode.eval = (code, input) => [...intCode(code, input)].slice(-1)[0]
+intCode.eval = (code, input, buffer) =>
+  [...intCode(code, input, buffer)].slice(-1)[0]
 
 intCode.amplifiers = amplifiers
 
