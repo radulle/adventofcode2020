@@ -9,7 +9,13 @@ global.console.infoTime = (logMe) => {
 
 try {
   const data = fs.readFileSync("data.txt", "utf8").split(",").map(Number)
-  console.infoTime(() => intCode.eval(data, [5]))
+  console.infoTime(() => solve(data))
 } catch (err) {
   console.error(err)
+}
+
+function solve(data) {
+  return [...intCode(data)]
+    .filter((_, i) => (i + 1) % 3 === 0)
+    .filter((e) => e === 2).length
 }
