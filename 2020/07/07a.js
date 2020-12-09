@@ -31,7 +31,7 @@ function solve(data, initColor) {
   let size
   while (true) {
     set.forEach((color) => {
-      data.get(color)?.forEach((e) => set.add(e))
+      data.get(color) && data.get(color).forEach((e) => set.add(e))
     })
     if (set.size === size) break
     size = set.size
