@@ -139,7 +139,7 @@ function getAllInstructions(data) {
     })
   }
 
-  function getParts(path) {
+  function getRoutines(path) {
     return [
       ...new Set(
         clean(clean(clean([[path.join(""), []]])))
@@ -149,7 +149,7 @@ function getAllInstructions(data) {
     ].slice(1)
   }
 
-  function getRoutines(path, parts) {
+  function getCompacted(path, parts) {
     let result = path
     parts.forEach(
       (part, idx) => (result = result.replace(part, idx.toString()))
@@ -157,10 +157,13 @@ function getAllInstructions(data) {
     return result
   }
 
-  const parts = getParts(path)
+  const parts = getRoutines(path)
 
-  const routines = getRoutines(
-    getRoutines(getRoutines(getRoutines(path.join(""), parts), parts), parts),
+  const compacted = getCompacted(
+    getCompacted(
+      getCompacted(getCompacted(path.join(""), parts), parts),
+      parts
+    ),
     parts
   )
 
@@ -168,47 +171,37 @@ function getAllInstructions(data) {
     return char.charCodeAt(0)
   }
 
-  function makeIntCode(str, fix) {
-    let intCode
-    if (!fix)
-      intCode = str
-        .split("")
-        .join("_,_")
-        .split("_")
-        .map((e) => cc("ABC"[e] || ","))
-    if (fix)
-      intCode = str
-        .match(/.{1,3}/gi)
-        .map((e) => [
-          cc(e[0]),
-          cc(","),
-          Number(e.slice(1))
-            .toString()
-            .split("")
-            .map((char) => cc(char.toString())),
-          cc(","),
-        ])
-        .flat(Infinity)
+  function makeIntCodeFromCompacted(str) {
+    const intCode = str
+      .split("")
+      .join("_,_")
+      .split("_")
+      .map((e) => cc("ABC"[e] || ","))
+    intCode.push(10)
+    return intCode
+  }
+  function makeIntCodeFromRoutines(str) {
+    const intCode = str
+      .match(/.{1,3}/gi)
+      .map((e) => [
+        cc(e[0]),
+        cc(","),
+        Number(e.slice(1))
+          .toString()
+          .split("")
+          .map((char) => cc(char.toString())),
+        cc(","),
+      ])
+      .flat(Infinity)
+    intCode.pop()
     intCode.push(10)
     return intCode
   }
 
-  console.info(
-    [
-      routines
-        .split("")
-        .map((e) => "ABC"[e])
-        .join(""),
-      ...parts,
-      "n",
-      "",
-    ].join("\n")
-  )
-
   return [
-    makeIntCode(routines),
-    ...parts.map((e) => makeIntCode(e, true)),
-    cc("n"),
+    makeIntCodeFromCompacted(compacted),
+    ...parts.map(makeIntCodeFromRoutines),
+    cc("y"), // TODO: intCode should work with "n" too
     10,
   ].flat()
 }
@@ -216,6 +209,5 @@ function getAllInstructions(data) {
 function solve(data) {
   const instructions = getAllInstructions([...data])
   data[0] = 2
-  const program = intCode([...data], instructions)
-  return { last40outputs: [...program].slice(-40) }
+  return intCode.eval([...data], instructions)
 }

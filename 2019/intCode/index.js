@@ -1,5 +1,4 @@
-const log = false
-const intCode = function* (data, input = [], buffer = true) {
+const intCode = function* (data, input = [], buffer = true, debug = false) {
   let i = 0
   let base = 0
   const op = (n) => {
@@ -29,7 +28,7 @@ const intCode = function* (data, input = [], buffer = true) {
   const res4 = () => data[i + 3] + (op(3) ? base : 0)
   const res2 = () => data[i + 1] + (op(1) ? base : 0)
   while (op() !== 99 && op() !== undefined) {
-    if (log)
+    if (debug)
       console.info({
         i,
         data: [data[i], data[i + 1], data[i + 2], data[i + 3]],
