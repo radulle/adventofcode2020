@@ -1,5 +1,4 @@
 const fs = require("fs")
-const { nth } = require("lodash")
 
 global.console.infoTime = (logMe) => {
   console.time()
