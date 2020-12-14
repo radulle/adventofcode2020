@@ -23,6 +23,21 @@ module.exports = class Graph {
     )
   }
 
+  fold(i) {
+    return Object.fromEntries(
+      Object.entries(this.adjacent).map(
+        ([key, { node, edges, locked, ...rest }]) => [
+          key.replace("(0)", `(${i})`),
+          {
+            key: key.replace("(0)", `(${i})`),
+            node: node.replace("(0)", `(${i})`),
+            edges: new Set([...edges].map((e) => e.replace("(0)", `(${i})`))),
+          },
+        ]
+      )
+    )
+  }
+
   getNodeByKey(key) {
     return this.adjacent[key]
   }
