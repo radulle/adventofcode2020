@@ -2,21 +2,22 @@ const fs = require("fs")
 
 const data = fs.readFileSync("data.txt", "utf8").split(",").map(Number)
 
-const map = new Map()
+console.time()
+const target = 2020
+const map = new Array(target)
 
 for (let i = 0; i < data.length - 1; i++) {
-  map.set(data[i], i)
+  map[data[i]] = i
 }
 
 let last = data[data.length - 1]
 let prev
 let result
-console.time()
-for (let idx = data.length - 1; idx < 2020; idx++) {
+for (let idx = data.length - 1; idx < target; idx++) {
   result = last
-  prev = map.get(last)
+  prev = map[last]
   prev = prev !== undefined ? idx - prev : 0
-  map.set(last, idx)
+  map[last] = idx
   last = prev
 }
 console.timeLog()

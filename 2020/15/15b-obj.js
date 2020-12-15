@@ -2,8 +2,9 @@ const fs = require("fs")
 
 const data = fs.readFileSync("data.txt", "utf8").split(",").map(Number)
 
+console.time()
 const target = 3e7
-const map = new Array(target)
+const map = new Object()
 
 for (let i = 0; i < data.length - 1; i++) {
   map[data[i]] = i
@@ -12,7 +13,6 @@ for (let i = 0; i < data.length - 1; i++) {
 let last = data[data.length - 1]
 let prev
 let result
-console.time()
 for (let idx = data.length - 1; idx < target; idx++) {
   result = last
   prev = map[last]
