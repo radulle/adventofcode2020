@@ -1,12 +1,12 @@
 const fs = require("fs")
-const Graph = require("./graph")
+const { Graph, Grid, toKey } = require("./graph")
 
-global.console.infoTime = (logMe) => {
-  console.time()
-  console.info(typeof logMe === "function" ? logMe() : logMe)
-  console.timeEnd()
-}
+const data = fs
+  .readFileSync("data.txt", "utf8")
+  .split("\r\n")
+  .map((row) => row.split(""))
 
+const grid = new Grid()
 const neighbors = [
   [1, 0],
   [0, 1],
@@ -14,137 +14,84 @@ const neighbors = [
   [0, -1],
 ]
 
-const grid = fs
-  .readFileSync("data.txt", "utf8")
-  .split("\r\n")
-  .map((row) => row.split(""))
-
-const graph = new Graph()
-
 const edges = []
-const locked = []
-for (let i = 1; i < grid.length - 1; i++) {
-  for (let j = 1; j < grid[i].length - 1; j++) {
-    gridToGraph(edges, grid, i, j)
+const height = data.length
+const width = data[0].length
+for (let i = 1; i < height - 1; i++) {
+  for (let j = 1; j < width - 1; j++) {
+    parseCell(i, j)
   }
 }
-edges.forEach(([A, B]) => graph.addEdge(A, B))
-locked.forEach(([A, B]) => graph.addLocked(A, B))
+edges.forEach(([A, B]) => grid.addEdge(A, B))
 
-function gridToGraph(edges, grid, i, j) {
-  const type = grid[i][j]
-  const bit =
-    (/[a-z]/.test(type) &&
-      Math.pow(2, type.charCodeAt(0) - "a".charCodeAt(0))) ||
-    0
+function parseCell(i, j) {
+  const type = data[i][j]
   if (type === "#") return
-  graph.addNode([i, j], type, { bit })
+  let group
+  if (/[A-Z]/.test(type)) group = "door"
+  if (/[a-z]/.test(type)) group = "key"
+  const node = grid.addNode([i, j], { type, group })
   neighbors.forEach(([y, x]) => {
-    if (grid[i + y][j + x] !== "#")
-      if (/[A-Z]/.test(type)) {
-        locked.push([
-          [i, j],
-          [i + y, j + x],
-        ])
-      } else {
-        edges.push([
-          [i, j],
-          [i + y, j + x],
-        ])
-      }
+    if (data[i + y][j + x] !== "#")
+      edges.push([toKey([i, j]), toKey([i + y, j + x])])
   })
 }
 
-class Scout {
-  keys = new Set()
+// Compress paths between distinct nodes
+const allKeys = grid.getDistinctCells().filter((e) => e.group === "key")
+const allDoors = grid.getDistinctCells().filter((e) => e.group === "door")
+const start = grid.getCellByType("@")
+const notDoors = [...allKeys, start]
+const filter = allDoors.map((e) => e.key)
+const compressed = grid
+  .compress()
+  .filter((e) => !(filter.includes(e[0]) || filter.includes(e[1])))
+  .filter((e) => e[0] !== e[1])
+  .map((e) => {
+    e[2].keyA = e[0]
+    e[2].keyB = e[1]
+    e[2].typeA = notDoors.find(({ key }) => e[0] === key).type
+    e[2].typeB = notDoors.find(({ key }) => e[1] === key).type
+    return e[2]
+  })
 
-  search(graph, sourceNode) {
-    const finishers = []
-    const cache = new Map()
+const finalists = []
+let que = [{ ...start, keyChain: [], depth: 0 }]
+const visited = new Map()
 
-    function getReachableKeys(graph, sourceKey) {
-      const reachable = graph.bfs(sourceKey)
-      return graph.getKeyNodes().reduce((acc, cur) => {
-        const steps = reachable.get(cur.key)
-        if (steps) acc.push({ ...cur, steps })
-        return acc
-      }, [])
-    }
-
-    function getReachables(graph, sourceKey) {
-      const reachable = graph.bfs(sourceKey)
-      return graph.getDistinctNodes().reduce((acc, cur) => {
-        const steps = reachable.get(cur.key)
-        if (steps) acc.push({ ...cur, steps })
-        return acc
-      }, [])
-    }
-
-    const search = (
-      graph,
-      { key, type, steps = 0, node, bit },
-      path = [0, 0],
-      recursionIdx = 0
-    ) => {
-      // console.info(graph.draw([{ node, type: "X" }]))
-      // console.info(
-      //   [path[0].toString(2), path[1]],
-      //   [...cache].map((e) => [
-      //     e[0].toString(2),
-      //     // .split("")
-      //     // .map((c) => String.fromCharCode("a".charCodeAt(0) + c * Number(c))),
-      //     e[1],
-      //   ])
-      // )
-      // console.info(recursionIdx)
-      if (recursionIdx > 26) return
-      if (
-        [...cache].some(
-          (cached) => (cached[0] & path[0]) === path[0] && cached[1] < path[1]
-        )
-      )
-        return
-      cache.set(...path)
-
-      const currentGraph = graph.copy()
-      const current = currentGraph.getNodeByKey(key)
-
-      current.type = "."
-      const door = currentGraph.getNodeByType(type.toUpperCase())
-      // console.info(door)
-      if (door) {
-        door.edges = door.locked
-        delete door.locked
-        door.type = "."
-      }
-      // console.info(door)
-
-      const reachables = getReachableKeys(currentGraph, key).sort((a,b) => b.steps - a.steps)
-
-      if (!currentGraph.getKeyNodes().length) return finishers.push(path)
-      if (!reachables.length) return
-
-      for (let reachable of reachables) {
-        const nodePath = [path[0] + reachable.bit, path[1] + reachable.steps]
-        search(currentGraph, reachable, nodePath, recursionIdx + 1)
-      }
-    }
-    search(graph, sourceNode)
-    return finishers
-  }
+for (let i = 0; i < allKeys.length; i++) {
+  const newQue = []
+  que.forEach((node) => {
+    const paths = compressed.filter(
+      ({ keyA, typeB, doors }) =>
+        keyA === node.key &&
+        typeB !== "@" &&
+        !node.keyChain.includes(typeB.toUpperCase()) &&
+        doors.every((door) => node.keyChain.includes(door))
+    )
+    const sources = paths.map(({ keyB: key, typeB, depth }) => ({
+      key,
+      keyChain: [...node.keyChain, typeB.toUpperCase()],
+      depth: depth + node.depth,
+    }))
+    sources
+      .sort((a, b) => a.depth - b.depth)
+      .forEach((source) => {
+        const list = [...source.keyChain]
+        const last = list.pop()
+        const hash = list.sort().join("") + last
+        const visitedDepth = visited.get(hash)
+        if (!visitedDepth || visitedDepth > source.depth) {
+          visited.set(hash, source.depth)
+          newQue.push(source)
+        }
+        if (source.keyChain.length === allKeys.length) {
+          finalists.push(source)
+        }
+      })
+  })
+  que = newQue
+  console.info(i, que.length)
 }
 
-const scout = new Scout()
-const result = scout.search(graph, graph.getNodeByType("@"))
-console.info(
-  // result,
-  result
-  // .map((route) =>
-  //   route.reduce((acc, { steps }) => {
-  //     return acc + steps
-  //   }, 0)
-  // )
-  .sort((a, b) => a[1] - b[1])
-)
-
-// 3944 too high
+console.info(finalists.sort((a, b) => a.depth - b.depth)[0])
