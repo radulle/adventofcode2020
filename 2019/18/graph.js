@@ -1,7 +1,5 @@
 class Graph {
-  constructor(adjacent = new Map()) {
-    this.adjacent = adjacent
-  }
+  adjacent = new Map()
 
   addNode(key) {
     if (this.adjacent.has(key)) throw new Error("Node already exists!")
@@ -40,25 +38,28 @@ class Graph {
   /** Weighted breadth first search */
   wbfs(source) {
     const visited = new Map()
-    let que = []
+    let que = [{ key: source, depth: 0, doors: [] }]
 
     visited.set(source, { depth: 0, doors: [] })
-    que.push({ key: source, depth: 0 , doors: []})
 
     while (que.length) {
-      let { key, depth , doors} = que.pop()
-      for (let node of this.adjacent.get(key).values()) {
-        const visitedNode = visited.get(node.key)
-        const cell = this.getCellByKey(node.key)
-        if (cell?.group === "door") doors = [...doors, cell.type]
-        if (
-          visitedNode?.depth === undefined ||
-          visitedNode.depth > depth + node.weight
-        ) {
-          visited.set(node.key, { depth: depth + node.weight, doors })
-          que.unshift({ key: node.key, depth: depth + node.weight, doors })
+      const newQue = []
+      for (let { key, depth, doors: nodeDoors } of que) {
+        for (let node of this.adjacent.get(key).values()) {
+          const visitedNode = visited.get(node.key)
+          const cell = this.getCellByKey(node.key)
+          const doors = [...nodeDoors]
+          if (cell?.group === "door") doors.push(cell.type)
+          if (
+            visitedNode?.depth === undefined ||
+            visitedNode.depth > depth + node.weight
+          ) {
+            visited.set(node.key, { depth: depth + node.weight, doors })
+            newQue.push({ key: node.key, depth: depth + node.weight, doors })
+          }
         }
       }
+      que = newQue
     }
     return visited
   }
@@ -81,34 +82,33 @@ class Graph {
   }
 
   clone() {
-    return new Graph(
-      new Map(
-        [...this.adjacent.entries()].map((row) => [row[0], cloneObj(row[1])])
-      )
-    )
+    const graph = new Graph()
+    graph.adjacent = new Map([...this.adjacent.entries()].map(cloneObj))
+    return graph
   }
 }
 
 class Grid extends Graph {
-  constructor(adjacent, cells = []) {
-    super(adjacent)
-    this.cells = cells
-  }
+  cells = []
+  height = 0
+  width = 0
 
   addNode(coords, obj) {
     const key = toKey(coords)
     if (!super.addNode(key)) return false
     const length = this.cells.push({ key, coords, ...obj })
+    if (coords[0] > this.height) this.height = coords[0]
+    if (coords[1] > this.width) this.width = coords[1]
     return this.cells[length - 1]
   }
 
   clone() {
-    return new Grid(
-      new Map(
-        [...this.adjacent.entries()].map((row) => [row[0], cloneObj(row[1])])
-      ),
-      cloneObj(this.cells)
-    )
+    const grid = new Grid()
+    grid.adjacent = new Map([...this.adjacent.entries()].map(cloneObj))
+    grid.cells = cloneObj(this.cells)
+    grid.height = this.height
+    grid.width = this.width
+    return grid
   }
 
   /* Draws grid [row, col] */
@@ -156,8 +156,33 @@ class Grid extends Graph {
           .map((keyDepth) => [key, ...keyDepth])
       )
     )
-
     return compressed
+  }
+
+  /** Path by unweighted breadth first search */
+  path(source, destination) {
+    const visited = new Map()
+    let que = [{ key: source, depth: 0, path: [] }]
+
+    visited.set(source, { depth: 0, path: [] })
+    while (que.length) {
+      const tQue = []
+      for (const { key, depth, path } of que) {
+        for (let node of this.adjacent.get(key).values()) {
+          if (!visited.has(node.key)) {
+            const element = {
+              key: node.key,
+              depth: depth + 1,
+              path: [...path, key],
+            }
+            if (destination === node.key) return element.path.slice(1)
+            visited.set(node.key, element)
+            tQue.push(element)
+          }
+        }
+        que = tQue
+      }
+    }
   }
 }
 
@@ -172,4 +197,4 @@ function cloneObj(obj) {
   return clone
 }
 
-module.exports = { Graph, Grid, toKey }
+module.exports = { Graph, Grid, toKey, cloneObj }

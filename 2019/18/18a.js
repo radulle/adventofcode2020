@@ -1,6 +1,7 @@
 const fs = require("fs")
-const { Graph, Grid, toKey } = require("./graph")
+const { Grid, toKey } = require("./graph")
 
+console.time()
 const data = fs
   .readFileSync("data.txt", "utf8")
   .split("\r\n")
@@ -30,7 +31,7 @@ function parseCell(i, j) {
   let group
   if (/[A-Z]/.test(type)) group = "door"
   if (/[a-z]/.test(type)) group = "key"
-  const node = grid.addNode([i, j], { type, group })
+  grid.addNode([i, j], { type, group })
   neighbors.forEach(([y, x]) => {
     if (data[i + y][j + x] !== "#")
       edges.push([toKey([i, j]), toKey([i + y, j + x])])
@@ -38,15 +39,16 @@ function parseCell(i, j) {
 }
 
 // Compress paths between distinct nodes
-const allKeys = grid.getDistinctCells().filter((e) => e.group === "key")
-const allDoors = grid.getDistinctCells().filter((e) => e.group === "door")
+const allDistinct = grid.getDistinctCells()
+const allKeys = allDistinct.filter((e) => e.group === "key")
+const allDoors = allDistinct.filter((e) => e.group === "door")
 const start = grid.getCellByType("@")
 const notDoors = [...allKeys, start]
 const filter = allDoors.map((e) => e.key)
 const compressed = grid
   .compress()
   .filter((e) => !(filter.includes(e[0]) || filter.includes(e[1])))
-  .filter((e) => e[0] !== e[1])
+  .filter((e) => e[0] !== e[1] && e[1] !== grid.getCellByType("@").key)
   .map((e) => {
     e[2].keyA = e[0]
     e[2].keyB = e[1]
@@ -54,6 +56,7 @@ const compressed = grid
     e[2].typeB = notDoors.find(({ key }) => e[1] === key).type
     return e[2]
   })
+console.timeLog()
 
 const finalists = []
 let que = [{ ...start, keyChain: [], depth: 0 }]
@@ -61,17 +64,16 @@ const visited = new Map()
 
 for (let i = 0; i < allKeys.length; i++) {
   const newQue = []
-  que.forEach((node) => {
+  for (const node of que) {
     const paths = compressed.filter(
       ({ keyA, typeB, doors }) =>
         keyA === node.key &&
-        typeB !== "@" &&
-        !node.keyChain.includes(typeB.toUpperCase()) &&
-        doors.every((door) => node.keyChain.includes(door))
+        !node.keyChain.includes(typeB) &&
+        !doors.some((door) => !node.keyChain.includes(door.toLowerCase()))
     )
     const sources = paths.map(({ keyB: key, typeB, depth }) => ({
       key,
-      keyChain: [...node.keyChain, typeB.toUpperCase()],
+      keyChain: [...node.keyChain, typeB],
       depth: depth + node.depth,
     }))
     sources
@@ -89,9 +91,27 @@ for (let i = 0; i < allKeys.length; i++) {
           finalists.push(source)
         }
       })
-  })
+  }
   que = newQue
   console.info(i, que.length)
 }
 
-console.info(finalists.sort((a, b) => a.depth - b.depth)[0])
+const result = finalists.sort((a, b) => a.depth - b.depth)[0]
+
+console.info()
+console.info(result)
+console.info()
+console.info("Total steps:")
+console.info(result.depth)
+console.timeLog()
+
+const path = []
+for (let idx = 0; idx < result.keyChain.length - 1; idx++) {
+  const A = grid.getCellByType(result.keyChain[idx]).key
+  const B = grid.getCellByType(result.keyChain[idx + 1]).key
+  path.push(
+    ...grid.path(A, B).map((e) => ({ coords: e.split(","), type: "+" }))
+  )
+}
+console.info(grid.draw(path))
+console.timeEnd()
