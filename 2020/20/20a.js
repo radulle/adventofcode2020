@@ -22,23 +22,31 @@ function parseData(data) {
   return parsed
 }
 
+/** transpose matrix */
 function transpose(tile) {
   return tile[0].map((_, colIndex) => tile.map((row) => row[colIndex]))
 }
-
-function findEdges(tiles) {
-  for (const tile of tiles) {
-    tile.edges = []
-    tile.edges.push(tile.tile[0].join(""))
-    tile.edges.push(tile.tile[tile.tile.length - 1].join(""))
-    tile.edges.push(transpose(tile.tile)[0].join(""))
-    tile.edges.push(transpose(tile.tile)[tile.tile.length - 1].join(""))
+/** hash top row */
+const top = (tile) => tile[0].join("")
+/** hash bottom row */
+const bot = (tile) => tile[tile.length - 1].join("")
+/** reverse string */
+const reverse = (str) => str.split("").reverse().join("")
+/** add edges to the piece */
+function addEdges(pieces) {
+  for (const piece of pieces) {
+    piece.edges = []
+    const tile = piece.tile
+    piece.edges.push(top(tile))
+    piece.edges.push(bot(tile))
+    piece.edges.push(top(transpose(tile)))
+    piece.edges.push(bot(transpose(tile)))
   }
-  return tiles
+  return pieces
 }
 
 function solve(file) {
-  const data = findEdges(parseData(getData(file)))
+  const data = addEdges(parseData(getData(file)))
 
   const filter = data.filter(
     (tile, idx, arr) =>
@@ -46,8 +54,7 @@ function solve(file) {
         if (
           arr.findIndex(
             ({ edges }, jdx) =>
-              (edges.includes(cur) ||
-                edges.includes(cur.split("").reverse().join(""))) &&
+              (edges.includes(cur) || edges.includes(reverse(cur))) &&
               jdx !== idx
           ) === -1
         ) {
@@ -56,7 +63,9 @@ function solve(file) {
         return acc
       }, 0) === 2
   )
+
   const agg = filter.reduce((acc, cur) => acc * cur.key, 1)
+  
   return agg
 }
 
