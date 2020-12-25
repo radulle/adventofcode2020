@@ -25,10 +25,17 @@ function manhattanDistances(intersections) {
   return intersections.map(([x, y]) => x + y).sort();
 }
 
+function intersect(a, b) {
+  var setA = new Set(a);
+  var setB = new Set(b);
+  var intersection = new Set([...setA].filter(x => setB.has(x)));
+  return Array.from(intersection);
+}
+
 function intersections(wire1, wire2) {
   const path1 = path(wire1).map(JSON.stringify);
   const path2 = path(wire2).map(JSON.stringify);
-  const intersections = _.intersection(path1, path2).map(JSON.parse);
+  const intersections = intersect(path1, path2).map(JSON.parse);
   return intersections;
 }
 
