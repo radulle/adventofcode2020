@@ -1,5 +1,5 @@
 const fs = require("fs")
-const { Graph } = require("./graph")
+const { Graph } = require("../graph")
 
 console.time()
 const data = fs

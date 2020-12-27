@@ -77,9 +77,57 @@ class Graph {
         que = newQue
       }
     }
+    if (options.returnCandidates) return candidates
     return candidates.sort((a, b) =>
       options.longest ? b.depth - a.depth : a.depth - b.depth
     )[0]
+  }
+
+  /**
+   *  Round trip problem (weighted)
+   *
+   *  (visit every node and get back to the first,
+   *  it is presumed that edge between every node is provided)
+   */
+  rtp(options = {}) {
+    const candidates = []
+    const traversed = new Map()
+    const source = this.adjacent.keys().next().value
+    let que = [{ key: source, depth: 0, visited: [source] }]
+    for (let i = 0; i < this.countNodes(); i++) {
+      const newQue = []
+      for (const { key, depth, visited } of que) {
+        const hash = [...visited].sort().join(",") + "," + key
+        if (traversed.has(hash)) {
+          if (options.longest && traversed.get(hash) > depth) continue
+          if (!options.longest && traversed.get(hash) < depth) continue
+        }
+        traversed.set(hash, depth)
+        if (visited.length === this.countNodes()) {
+          candidates.push({
+            visited,
+            depth: depth + this.adjacent.get(key)?.get(source).weight,
+          })
+          continue
+        }
+        for (const { key: dest, weight } of this.adjacent.get(key).values()) {
+          if (visited.includes(dest)) continue
+          newQue.push({
+            key: dest,
+            depth: depth + weight,
+            visited: [...visited, dest],
+          })
+        }
+      }
+      que = newQue
+    }
+
+    candidates.sort((a, b) =>
+      options.longest ? b.depth - a.depth : a.depth - b.depth
+    )
+
+    if (options.returnCandidates) return candidates
+    return candidates[0]
   }
 
   /** Weighted breadth first search */
