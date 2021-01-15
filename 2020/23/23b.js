@@ -1,6 +1,6 @@
 console.time()
 const fs = require("fs")
-const { CircularLinkedList, Node } = require("../linkedList")
+const { CircularLinkedListMapped, Node } = require("lib")
 
 function getData(file) {
   return fs.readFileSync(file, "utf8").trim()
@@ -11,7 +11,7 @@ function parseData(data) {
   return split
 }
 
-class Cups extends CircularLinkedList {
+class Cups extends CircularLinkedListMapped {
   pickedCups
   dest
   destCup
