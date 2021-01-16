@@ -1,5 +1,4 @@
 const fs = require("fs")
-const crypto = require("crypto")
 console.time()
 
 const data = fs.readFileSync("data.txt", "utf8").trim()
