@@ -1,28 +1,16 @@
 const fs = require("fs")
-const lib = require("lib")
+const getGroups = require(".")
 console.time()
 
+const data = fs.readFileSync("data.txt", "utf8").matchAll(/(\d+) <-> (.+)/g)
+
 const nodes = new Map()
-const groups = []
-for (node of fs.readFileSync("data.txt", "utf8").matchAll(/(\d+) <-> (.+)/g)) {
+for (node of data) {
   nodes.set(node[1], node[2].split(", "))
 }
 
-function drill(key, group) {
-  if (group.has(key)) return
-  group.add(key)
-  nodes.get(key).forEach((n) => drill(n, group))
-}
+const groups = getGroups(nodes)
 
-while (nodes.size) {
-  const group = new Set()
-  groups.push(group)
-  const key = nodes.keys().next().value
-  drill(key, group)
-  for (const key of group) {
-    nodes.delete(key)
-  }
-}
 const resultA = groups[0].size
 
 const resultB = groups.length
