@@ -1,0 +1,26 @@
+b = 81
+c = b
+if (a !== 0) goto A // if
+goto B 
+A: b = 100 * b + 100000
+c = b + 17000
+B: f = 1 // loop start (first)
+d = 2
+E: e = 2 // loop start
+D: g = d * e - b // loop start
+if (g !== 0) goto C // if
+f = 0
+C: e++
+g = e - b
+if (g !== 0) goto D // while
+d++
+g = d - b
+if (g !== 0) goto E // while
+if (f !== 0) goto F // if
+h++
+F: g = b - c
+if (g !== 0) goto G // while
+goto H
+G: b += 17
+goto B // while
+H:
