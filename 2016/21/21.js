@@ -1,5 +1,5 @@
 const fs = require("fs")
-const { LinkedListDoubleCircular } = require("lib")
+const { LinkedListDoubleCircular } = require("../linkedList")
 console.time()
 
 class Code extends LinkedListDoubleCircular {}

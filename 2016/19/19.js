@@ -1,5 +1,8 @@
 const fs = require("fs")
-const { LinkedListDoubleCircular, LinkedListDoubleCircularMid } = require("lib")
+const {
+  LinkedListDoubleCircular,
+  LinkedListDoubleCircularMid,
+} = require("../linkedList")
 console.time()
 
 const size = +fs.readFileSync("data.txt", "utf8").trim()
