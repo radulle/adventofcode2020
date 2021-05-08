@@ -166,7 +166,7 @@ const resultB =
   B.actors.map((e) => e.hp).reduce((acc, cur) => acc + cur) * B.round
 
 console.info("\nSolution A:\n")
-console.info(resultA, "\n")
+console.info(resultA)
 console.info("\nSolution B:")
 console.info(resultB, "\n")
 console.timeEnd()
