@@ -1,4 +1,4 @@
-// #grid
+// #grid #dijkstra
 const fs = require("fs")
 const { StackQue } = require("lib")
 console.time()

@@ -18,7 +18,6 @@ const cut = (deck, n) => [...deck.slice(n), ...deck.slice(0, n)]
 
 const increment = (deck, n) => {
   let i = 0
-  let j = 0
   const newDeck = new Array(size)
   deck.forEach((el) => {
     newDeck[(i * n) % size] = el
@@ -42,7 +41,4 @@ const shuffled = data.reduce(
   (acc, { func, arg }) => shuffle(acc, func, arg),
   factoryDeck
 )
-console.info(
-  shuffled,
-  shuffled.findIndex((e) => e === 2019)
-)
+console.info(shuffled.findIndex((e) => e === 2019))
