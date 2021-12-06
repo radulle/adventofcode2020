@@ -1,14 +1,9 @@
-const fs = require("fs");
+const { input, consoleTime } = require("lib");
 
-const consoleTime = (logMe) => {
-  console.time();
-  console.info(logMe());
-  console.timeEnd();
-};
+const data = input;
 
 const GRID_SIZE = 5;
 const GRID_ELEMENTS = GRID_SIZE ** 2;
-const data = fs.readFileSync("data.txt", "utf8");
 
 const getTicket = (j) => Math.floor(j / GRID_ELEMENTS);
 

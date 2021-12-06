@@ -1,13 +1,6 @@
-const fs = require("fs");
+const { input, consoleTime } = require("lib");
 
-const consoleTime = (logMe) => {
-  console.time();
-  console.info(logMe());
-  console.timeEnd();
-};
-
-const data = fs
-  .readFileSync("data.txt", "utf8")
+const data = input
   .split("\n")
   .map((e) => e.split(" -> ").map((e) => e.split(",").map(Number)));
 
