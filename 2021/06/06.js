@@ -1,6 +1,6 @@
 const { input, consoleTime } = require("lib");
 
-const data = input.split(",").map(Number);
+const data = input().split(",").map(Number);
 
 consoleTime(() => solve(data, 80));
 consoleTime(() => solve(data, 256));

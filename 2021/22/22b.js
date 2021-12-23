@@ -2,7 +2,7 @@ const { input, consoleTime } = require("lib");
 
 consoleTime(() => {
   const instructions = [
-    ...input.matchAll(
+    ...input().matchAll(
       /(on|off) x=(-?\d+)..(-?\d+),y=(-?\d+)..(-?\d+),z=(-?\d+)..(-?\d+)/g
     ),
   ].map((row) => [...row.slice(2, 8), row[1] === "on" ? 1 : 0].map(Number));

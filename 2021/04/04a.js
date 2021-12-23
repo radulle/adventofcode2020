@@ -1,6 +1,6 @@
 const { input, consoleTime } = require("lib");
 
-const data = input;
+const data = input();
 
 const GRID_SIZE = 5;
 const GRID_ELEMENTS = GRID_SIZE ** 2;

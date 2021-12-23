@@ -1,6 +1,8 @@
 const { input, consoleTime } = require("lib");
 
-const data = input.split("\n").map((e) => e.split("").map(Number));
+const data = input()
+  .split("\n")
+  .map((e) => e.split("").map(Number));
 consoleTime(() => solve(data));
 
 function solve(data) {

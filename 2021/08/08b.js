@@ -11,7 +11,7 @@ Object.prototype.addReverseLookup = function () {
   );
 };
 
-const data = input
+const data = input()
   .split("\n")
   .map((row) =>
     row

@@ -1,7 +1,7 @@
 const { input, consoleTime } = require("lib");
 
 consoleTime(() => {
-  let [alg, img] = input.split("\n\n");
+  let [alg, img] = input().split("\n\n");
   const num = (e) => (e === "#" ? 1 : 0);
   alg = alg.split("").map(num);
   img = img.split("\n").map((row) => row.split("").map(num));

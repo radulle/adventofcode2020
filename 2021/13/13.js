@@ -3,7 +3,7 @@ const { input, consoleTime } = require("lib");
 const points = [];
 let X = 0,
   Y = 0;
-for (const e of input.matchAll(/(\d+),(\d+)/g)) {
+for (const e of input().matchAll(/(\d+),(\d+)/g)) {
   const x = +e[1],
     y = +e[2];
   points.push([x, y]);
@@ -18,7 +18,7 @@ points.forEach(([j, i]) => {
 });
 
 const folds = [];
-for (const [_, ori, pos] of input.matchAll(/(x|y)=(\d+)/g)) {
+for (const [_, ori, pos] of input().matchAll(/(x|y)=(\d+)/g)) {
   folds.push([ori, +pos]);
 }
 

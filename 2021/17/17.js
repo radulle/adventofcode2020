@@ -1,6 +1,6 @@
 const { input, consoleTime } = require("lib");
 
-const data = input
+const data = input()
   .match(/target area: x=(-?\d+)..(-?\d+), y=(-?\d+)..(-?\d+)/)
   .slice(1, 5)
   .map(Number);

@@ -30,14 +30,16 @@ class CaveGraph extends Graph {
 
 const graph = new CaveGraph();
 
-input.split("\n").forEach((row) => {
-  const edge = row.split("-");
-  edge.forEach((node) => {
-    if (!graph.hasNode(node)) graph.addNode(node);
+input()
+  .split("\n")
+  .forEach((row) => {
+    const edge = row.split("-");
+    edge.forEach((node) => {
+      if (!graph.hasNode(node)) graph.addNode(node);
+    });
+    graph.addEdge(...edge);
+    graph.addEdge(...edge.reverse());
   });
-  graph.addEdge(...edge);
-  graph.addEdge(...edge.reverse());
-});
 
 consoleTime(() => solve(graph));
 

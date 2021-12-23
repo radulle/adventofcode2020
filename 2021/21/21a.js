@@ -1,7 +1,7 @@
 const { input, consoleTime } = require("lib");
 
 consoleTime(() => {
-  const pos = [...input.matchAll(/Player \d+ starting position: (\d+)/g)].map(
+  const pos = [...input().matchAll(/Player \d+ starting position: (\d+)/g)].map(
     (e) => Number(e[1])
   );
 

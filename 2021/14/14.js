@@ -1,8 +1,10 @@
 const { input, consoleTime } = require("lib");
 
-let polymer = input.slice(0, input.indexOf("\n"));
+const data = input();
+
+let polymer = data.slice(0, data.indexOf("\n"));
 const trans = {};
-for (const [_, pair, add] of input.matchAll(/(\w+) -> (\w+)/g)) {
+for (const [_, pair, add] of data.matchAll(/(\w+) -> (\w+)/g)) {
   trans[pair] = add;
 }
 const empty = Object.keys(trans).reduce((acc, key) => {

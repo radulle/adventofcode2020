@@ -4,7 +4,7 @@ const { input, consoleTime } = require("lib");
 let data = [];
 {
   let scanner = -1;
-  for (const row of input.split("\n")) {
+  for (const row of input().split("\n")) {
     if (row[0] === undefined) continue;
     const beacon = row.split(",").map(Number);
     if (beacon.length === 3) {

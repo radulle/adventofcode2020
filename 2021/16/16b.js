@@ -110,4 +110,4 @@ function solve(data) {
   return parse(bin).dec;
 }
 
-consoleTime(() => solve(input));
+consoleTime(() => solve(input()));

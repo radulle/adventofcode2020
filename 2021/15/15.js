@@ -1,6 +1,8 @@
 const { input, consoleTime, StackQue } = require("lib");
 
-const data = input.split("\n").map((row) => row.split("").map(Number));
+const data = input()
+  .split("\n")
+  .map((row) => row.split("").map(Number));
 
 function goBig(data, multiply) {
   const mR = data.length;

@@ -1,6 +1,8 @@
 const { input, consoleTime } = require("lib");
 
-const data = input.split("\n").map((row) => row.split("").map(Number));
+const data = input()
+  .split("\n")
+  .map((row) => row.split("").map(Number));
 
 function flash(
   matrix,

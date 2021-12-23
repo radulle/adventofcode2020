@@ -76,4 +76,4 @@ function solve(data) {
   return versions.reduce((acc, cur) => acc + cur);
 }
 
-consoleTime(() => solve(input));
+consoleTime(() => solve(input()));

@@ -1,6 +1,6 @@
 const { input, consoleTime } = require("lib");
 
-const data = input
+const data = input()
   .split(",")
   .map(Number)
   .sort((a, b) => a - b);

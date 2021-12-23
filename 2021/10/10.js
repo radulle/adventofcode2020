@@ -1,6 +1,6 @@
 const { input, consoleTime } = require("lib");
 
-const data = input.split("\n");
+const data = input().split("\n");
 
 const brackets = { "(": ")", "[": "]", "{": "}", "<": ">" };
 const open = Object.keys(brackets);
