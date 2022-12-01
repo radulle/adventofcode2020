@@ -1,15 +1,6 @@
-const { consoleTime } = require("lib");
+const { consoleTime, processLines } = require("lib");
 
 consoleTime(() => solve());
-
-async function processLines(filePath, processLine) {
-  const rl = require("readline").createInterface({
-    input: require("fs").createReadStream(filePath),
-    crlfDelay: Infinity,
-  });
-  rl.on("line", processLine);
-  await require("events").once(rl, "close");
-}
 
 async function solve() {
   const sums = [0];
@@ -34,5 +25,3 @@ async function solve() {
   }
   console.info(sum);
 }
-
-// conclusion: readline is slightly slower on small data sets, while faster by several orders of magnitude on large.
