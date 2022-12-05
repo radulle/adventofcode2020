@@ -7,10 +7,7 @@ function solve() {
     .split("\n\n")
     .map((e) => e.split("\n").map(Number));
 
-  const sums = data
-    .map((e) => e.reduce((acc, cur) => acc + cur, 0))
-    .sort()
-    .reverse();
+  const sums = data.map((e) => e.reduce((acc, cur) => acc + cur, 0));
 
   sums.sort((a, b) => b - a);
   console.info(sums[0]);
