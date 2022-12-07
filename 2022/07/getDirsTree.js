@@ -17,28 +17,34 @@ exports.getDirsTree = function getDirsTree() {
   let pwd = root;
 
   for (const line of data) {
-    if (line === "$ cd /") {
-      pwd = root;
-      continue;
+    {
+      const dirName = /^\$ cd (.+)/.exec(line)?.[1];
+
+      if (dirName === "/") {
+        pwd = root;
+        continue;
+      }
+
+      if (dirName === "..") {
+        pwd = pwd.parent;
+        continue;
+      }
+
+      if (dirName) {
+        let child = pwd.children.find((e) => e.name === dirName);
+        if (!child) pwd.children.push((child = new Node(dirName, pwd)));
+        pwd = child;
+        continue;
+      }
     }
-    if (line === "$ cd ..") {
-      pwd = pwd.parent;
-      continue;
-    }
-    if (/^\$ cd (.+)/.test(line)) {
-      const dirName = /^\$ cd (.+)/.exec(line)[1];
-      if (pwd.children.every((e) => e.name !== dirName))
-        pwd.children.push(new Node(dirName, pwd));
-      pwd = pwd.children.find((e) => e.name === dirName);
-      continue;
-    }
-    if (line === "$ ls") continue;
-    if (/^dir/.test(line)) continue;
-    const size = +/^(\d+)/.exec(line)[1];
-    (function r(dir) {
-      dir.size += size;
-      if (dir.parent) r(dir.parent);
-    })(pwd);
+
+    const size = +/^(\d+)/.exec(line)?.[1];
+    if (size)
+      (function r(dir) {
+        dir.size += size;
+        if (dir.parent) r(dir.parent);
+      })(pwd);
   }
+
   return root;
 };
