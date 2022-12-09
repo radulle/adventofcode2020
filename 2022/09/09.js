@@ -1,9 +1,6 @@
 const { input, consoleTime } = require("lib");
 const { move, adjecent, closer } = require("./cmn");
 
-const START = 300;
-const SIZE = 600;
-
 consoleTime(() => solve(2));
 consoleTime(() => solve(10));
 
@@ -14,11 +11,9 @@ function solve(snakeLength) {
 
   let snake = Array(snakeLength)
     .fill(null)
-    .map(() => [START, START]);
+    .map(() => [0, 0]);
 
-  const grid = Array(SIZE)
-    .fill(null)
-    .map(() => Array(SIZE).fill(0));
+  const visited = new Set();
 
   for (const line of data) {
     const dir = line[0];
@@ -29,10 +24,10 @@ function solve(snakeLength) {
         if (adjecent(snake[j - 1], snake[j])) break;
         snake[j] = closer(snake[j - 1], snake[j]);
       }
-      grid[snake[snakeLength - 1][0]][snake[snakeLength - 1][1]] = 1;
+      visited.add(snake.at(-1).join(","));
     }
   }
 
-  console.info(grid.flat().reduce((acc, cur) => acc + cur, 0));
+  console.info(visited.size);
   console.info("end");
 }
