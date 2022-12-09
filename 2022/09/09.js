@@ -1,15 +1,15 @@
 const { input, consoleTime } = require("lib");
-const { move, adjecent, closer } = require("./cmn");
+const { move, adjecent, middle } = require("./cmn");
 
 consoleTime(() => solve(2));
 consoleTime(() => solve(10));
 
-function solve(snakeLength) {
+function solve(ropeLength) {
   const data = input()
     .split("\n")
     .map((e) => e.split(" "));
 
-  let snake = Array(snakeLength)
+  let rope = Array(ropeLength)
     .fill(null)
     .map(() => [0, 0]);
 
@@ -19,12 +19,12 @@ function solve(snakeLength) {
     const dir = line[0];
     const len = +line[1];
     for (let i = 0; i < len; i++) {
-      snake[0] = move[dir](snake[0]);
-      for (let j = 1; j < snake.length; j++) {
-        if (adjecent(snake[j - 1], snake[j])) break;
-        snake[j] = closer(snake[j - 1], snake[j]);
+      rope[0] = move[dir](rope[0]);
+      for (let j = 1; j < rope.length; j++) {
+        if (adjecent(rope[j - 1], rope[j])) break;
+        rope[j] = middle(rope[j - 1], rope[j]);
       }
-      visited.add(snake.at(-1).join(","));
+      visited.add(rope.at(-1).join(","));
     }
   }
 
