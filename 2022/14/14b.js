@@ -90,6 +90,5 @@ function solve() {
 
   grid = grid.map((row) => row.slice(left - 1, right + 2));
   console.info(grid.map((e) => e.join("")).join("\n"));
-  console.info(left, right);
   console.info(grid.flat().reduce((a, c) => a + (c === "o" ? 1 : 0), 0));
 }
