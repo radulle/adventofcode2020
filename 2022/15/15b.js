@@ -4,6 +4,8 @@ consoleTime(() => solve());
 
 function solve() {
   let SIZE = 4_000_000;
+  if (process.argv[2] === "ex.txt") SIZE = 20;
+
   const data = input()
     .split("\n")
     .map((e) =>

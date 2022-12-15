@@ -5,6 +5,8 @@ consoleTime(() => solve());
 function solve() {
   const set = new Set();
   let Y1 = 2_000_000;
+  if (process.argv[2] === "ex.txt") Y1 = 10;
+
   const data = input()
     .split("\n")
     .map((e) =>
