@@ -68,7 +68,7 @@ function solve() {
     }
   }
 
-  explore("AA", 0, -1, 0);
+  explore("AA", ids.AA, -1, 0);
 
   console.info(maxFlow);
 }

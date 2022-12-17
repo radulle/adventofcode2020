@@ -68,15 +68,16 @@ function solve() {
     }
   }
 
-  explore("AA", 0, -1, 0);
+  explore("AA", ids.AA, -1, 0);
 
-  const S = [...totals.entries()];
+  const S = Array.from(totals);
 
   let maxFlow = 0;
 
   for (const a of S) {
     for (const b of S) {
-      if (!(a[0] & b[0]) && a[1] + b[1] > maxFlow) maxFlow = a[1] + b[1];
+      if ((a[0] & b[0]) === ids.AA && a[1] + b[1] > maxFlow)
+        maxFlow = a[1] + b[1];
     }
   }
 
