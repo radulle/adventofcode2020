@@ -51,9 +51,10 @@ function solve() {
   }
 
   const ids = [...Object.keys(dists)].reduce((a, c, i) => {
-    a[c] = i;
+    a[c] = 2 ** i;
     return a;
   }, {});
+
   let maxFlow = -Infinity;
 
   function explore(to, visited, minute, released) {
@@ -64,8 +65,8 @@ function solve() {
     if (maxFlow < released) maxFlow = released;
 
     for (const [key, dist] of dists[to].entries()) {
-      if ((2 ** ids[key]) & visited) continue;
-      explore(key, visited + 2 ** ids[key], minute + dist, released);
+      if (ids[key] & visited) continue;
+      explore(key, visited + ids[key], minute + dist, released);
     }
   }
 

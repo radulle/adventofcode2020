@@ -51,9 +51,10 @@ function solve() {
   }
 
   const ids = [...Object.keys(dists)].reduce((a, c, i) => {
-    a[c] = i;
+    a[c] = 2 ** i;
     return a;
   }, {});
+
   const totals = new Map();
 
   function explore(to, visited, minute, released) {
@@ -64,24 +65,22 @@ function solve() {
     if ((totals.get(visited) || 0) < released) totals.set(visited, released);
 
     for (const [key, dist] of dists[to].entries()) {
-      if ((2 ** ids[key]) & visited) continue;
-      explore(key, visited + 2 ** ids[key], minute + dist, released);
+      if (ids[key] & visited) continue;
+      explore(key, visited + ids[key], minute + dist, released);
     }
   }
 
   explore("AA", 0, -1, 0);
 
-  const combinations = [...totals.entries()];
+  const S = [...totals.entries()];
 
   let maxFlow = 0;
 
-  for (let i = 0; i < combinations.length; i++) {
-    for (let j = 0; j < combinations.length; j++) {
-      if (i === j) continue;
-      const a = combinations[i];
-      const b = combinations[j];
+  for (const a of S) {
+    for (const b of S) {
       if (!(a[0] & b[0]) && a[1] + b[1] > maxFlow) maxFlow = a[1] + b[1];
     }
   }
+
   console.info(maxFlow);
 }
