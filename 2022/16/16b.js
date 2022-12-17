@@ -15,7 +15,7 @@ function solve() {
   const dists = {};
   const flows = {};
   const graph = new Graph();
-  const MINUTES = 30;
+  const MINUTES = 26;
 
   for (const { from, to, flow } of data) {
     if (!graph.hasNode(from)) graph.addNode(from);
@@ -54,14 +54,14 @@ function solve() {
     a[c] = i;
     return a;
   }, {});
-  let maxFlow = -Infinity;
+  const totals = new Map();
 
   function explore(to, visited, minute, released) {
     if (minute > MINUTES) return;
 
     minute++;
     released += flows[to] * (MINUTES - minute);
-    if (maxFlow < released) maxFlow = released;
+    if ((totals.get(visited) || 0) < released) totals.set(visited, released);
 
     for (const [key, dist] of dists[to].entries()) {
       if ((2 ** ids[key]) & visited) continue;
@@ -71,5 +71,17 @@ function solve() {
 
   explore("AA", 0, -1, 0);
 
+  const combinations = [...totals.entries()];
+
+  let maxFlow = 0;
+
+  for (let i = 0; i < combinations.length; i++) {
+    for (let j = 0; j < combinations.length; j++) {
+      if (i === j) continue;
+      const a = combinations[i];
+      const b = combinations[j];
+      if (!(a[0] & b[0]) && a[1] + b[1] > maxFlow) maxFlow = a[1] + b[1];
+    }
+  }
   console.info(maxFlow);
 }
