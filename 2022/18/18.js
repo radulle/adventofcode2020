@@ -7,7 +7,7 @@ consoleTime(() => solve());
 function solve() {
   const data = input()
     .split("\n")
-    .map((e) => e.split(",").map((e) => +e + 2));
+    .map((e) => e.split(",").map((e) => +e + 1));
 
   let size = -Infinity;
   for (const [x, y, z] of data) {
@@ -15,7 +15,7 @@ function solve() {
     if (y > size) size = y;
     if (z > size) size = z;
   }
-  size += 3;
+  size += 2;
 
   const lava = new Array(size).fill().map(() =>
     Array(size)
@@ -26,8 +26,7 @@ function solve() {
 
   console.info(gridArea(lava));
 
-  const water = gridBFS(lava, 0, 0, 0);
-  console.info(gridArea(water));
+  console.info(gridBFS(lava, 0, 0, 0));
 }
 
 function gridArea(grid) {
@@ -53,7 +52,9 @@ function gridArea(grid) {
   return area;
 }
 
-function gridBFS(grid, sx, sy, sz, f) {
+function gridBFS(grid, sx, sy, sz) {
+  let area = 0; // 2022-18 specific
+
   const dx = [-1, 1, 0, 0, 0, 0];
   const dy = [0, 0, 1, -1, 0, 0];
   const dz = [0, 0, 0, 0, 1, -1];
@@ -68,9 +69,7 @@ function gridBFS(grid, sx, sy, sz, f) {
   const visited = new Array(X)
     .fill()
     .map(() => new Array(Y).fill().map(() => new Array(Z).fill()));
-  const result = new Array(X)
-    .fill()
-    .map(() => new Array(Y).fill().map(() => new Array(Z).fill(" ")));
+  // const result = [];
 
   qx.enqueue(sx);
   qy.enqueue(sy);
@@ -80,14 +79,22 @@ function gridBFS(grid, sx, sy, sz, f) {
   let currentLayerCount = 1;
   let nextLayerCount = 0;
 
-  function exploreNeighbors(x, y, z) {
+  function exploreNeighbors(x, y, z, dd) {
     for (let i = 0; i < neighbors; i++) {
       const xx = x + dx[i];
       const yy = y + dy[i];
       const zz = z + dz[i];
+
       if (xx < 0 || yy < 0 || zz < 0 || xx >= X || yy >= Y || zz >= Z) continue;
+
+      const vv = grid[xx][yy][zz];
+      if (vv === "#") {
+        area++;
+        continue;
+      } // 2022-18 specific
       if (visited[xx][yy][zz]) continue;
-      if (grid[xx][yy][zz] === "#") continue;
+      // if (vv === "#") continue;
+      // result.push({ x, y, z, xx, yy, zz, vv, dd });
       qx.enqueue(xx);
       qy.enqueue(yy);
       qz.enqueue(zz);
@@ -100,9 +107,8 @@ function gridBFS(grid, sx, sy, sz, f) {
     const x = qx.dequeue();
     const y = qy.dequeue();
     const z = qz.dequeue();
-    const f = grid[x][y][z];
-    if (f !== "#") result[x][y][z] = "#"; // dist
-    exploreNeighbors(x, y, z);
+
+    exploreNeighbors(x, y, z, dist + 1);
     currentLayerCount--;
     if (currentLayerCount === 0) {
       currentLayerCount = nextLayerCount;
@@ -110,5 +116,7 @@ function gridBFS(grid, sx, sy, sz, f) {
       dist++;
     }
   }
-  return result;
+
+  return area; // 2022-18 specific
+  // return result;
 }

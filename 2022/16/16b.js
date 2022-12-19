@@ -1,3 +1,5 @@
+// #graph #bitmap #multyTraversal
+
 const { input, consoleTime, Graph } = require("lib");
 
 consoleTime(() => solve());
@@ -53,14 +55,15 @@ function solve() {
   }
 
   const MINUTES = 26;
-  const totals = new Map();
+  const maximums = new Map();
 
   function explore(to, visited, minute, released) {
     if (minute > MINUTES) return;
 
     minute++;
     released += flows[to] * (MINUTES - minute);
-    if ((totals.get(visited) || 0) < released) totals.set(visited, released);
+    if ((maximums.get(visited) || 0) < released)
+      maximums.set(visited, released);
 
     for (const [key, dist] of dists[to].entries()) {
       if (ids[key] & visited) continue;
@@ -70,16 +73,15 @@ function solve() {
 
   explore("AA", ids.AA, -1, 0);
 
-  const S = Array.from(totals);
+  const S = Array.from(maximums);
 
-  let maxFlow = 0;
+  let max = 0;
 
   for (const a of S) {
     for (const b of S) {
-      if ((a[0] & b[0]) === ids.AA && a[1] + b[1] > maxFlow)
-        maxFlow = a[1] + b[1];
+      if ((a[0] & b[0]) === ids.AA && a[1] + b[1] > max) max = a[1] + b[1];
     }
   }
 
-  console.info(maxFlow);
+  console.info(max);
 }
