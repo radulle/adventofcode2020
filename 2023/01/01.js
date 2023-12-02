@@ -29,5 +29,5 @@ function solve(handleWords) {
 
   const sum = data.reduce((acc, curr) => acc + curr, 0);
 
-  console.info(sum);
+  return sum;
 }
