@@ -15,7 +15,7 @@ function parse(input, part) {
     .split(/ +/)
     .slice(1)
     .map((e) => +e);
-  seeds.push(_seeds.map((e) => [e, e + 1]));
+  seeds.push(_seeds.map((e) => [e, e]));
   seeds.push([]);
   for (let i = 0; i < _seeds.length - 1; i += 2) {
     seeds[1].push([_seeds[i], _seeds[i] + _seeds[i + 1]]);
@@ -30,7 +30,10 @@ function parse(input, part) {
         .split(/ +/)
         .map((e) => +e)
     );
-    numbers = numbers.map((e) => [[e[1], e[1] + e[2]], (n) => n - e[1] + e[0]]);
+    numbers = numbers.map((e) => [
+      [e[1], e[1] + e[2] - 1],
+      (n) => n - e[1] + e[0],
+    ]);
     transforms.push(numbers);
   });
 
@@ -73,6 +76,7 @@ function process(seeds, transforms) {
             nSeeds.push([intersections[k][1] + 1, intersections[k + 1][0] - 1]);
       } else nSeeds.push([bot, top]);
     }
+    console.log(nSeeds);
     seeds = nSeeds;
   }
   return Math.min(...seeds.map((e) => e[0]));
