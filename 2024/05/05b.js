@@ -27,11 +27,11 @@ function process({ rules, updates }) {
           pages[li] = r;
           pages[ri] = l;
           correct = false;
-          if (!invalid.includes(pages)) invalid.push(pages)
+          if (!invalid.includes(pages)) invalid.push(pages);
         }
       }
     }
   }
 
-  return invalid.map(e => e[e.length / 2 - 0.5]).reduce((a, b) => a + b, 0);
+  return invalid.map((e) => e[e.length / 2 - 0.5]).reduce((a, b) => a + b, 0);
 }

@@ -24,9 +24,8 @@ function process({ rules, updates }) {
         continue pages;
       }
     }
-    valid.push(pages)
+    valid.push(pages);
   }
 
-
-  return valid.map(e => e[e.length / 2 - 0.5]).reduce((a, b) => a + b, 0);
+  return valid.map((e) => e[e.length / 2 - 0.5]).reduce((a, b) => a + b, 0);
 }
