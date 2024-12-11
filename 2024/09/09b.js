@@ -3,7 +3,7 @@ const { input, consoleTime } = require("lib");
 consoleTime(() => solve(input()));
 
 function solve(input) {
-  return [process(parse(input))];
+  return process(parse(input));
 }
 
 function parse(input) {
@@ -23,14 +23,14 @@ function parse(input) {
 }
 
 function process([empty, full]) {
-  Full: for (let i = full.length - 1; i >= 0; i--) {
+  full: for (let i = full.length - 1; i >= 0; i--) {
     const ff = full[i];
-    Empty: for (let j = 0; j <= empty.length; j++) {
+    empty: for (let j = 0; j <= empty.length; j++) {
       const ee = empty[j];
-      if (ee[0] >= ff[0]) break Empty;
+      if (ee[0] >= ff[0]) break empty;
       if (ff[1] <= ee[1]) {
         (ff[0] = ee[0]), (ee[0] += ff[1]), (ee[1] -= ff[1]);
-        continue Full;
+        continue full;
       }
     }
   }
