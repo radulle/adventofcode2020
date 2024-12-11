@@ -30,8 +30,7 @@ function process(stones, N) {
   }
 
   let sum = 0;
-  for (const key in stones)
-    sum += stones[key];
+  for (const key in stones) sum += stones[key];
 
   return sum;
 }
