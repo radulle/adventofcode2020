@@ -30,21 +30,22 @@ function process(grid) {
   let i = 0;
 
   while (true) {
-    const rr = r + dr[i]
-    const cc = c + dc[i]
+    const rr = r + dr[i];
+    const cc = c + dc[i];
 
     if (!(rr >= 0 && rr < grid.length && cc >= 0 && cc < grid[0].length)) break;
 
-    const vv = grid[rr][cc]
+    const vv = grid[rr][cc];
 
-    if (vv === '#') {
-      if (i < 3) { i++ } else { i = 0 }
-      continue
+    if (vv === "#") {
+      if (i < 3) i++;
+      else i = 0;
+      continue;
     }
 
-    visited.add(`${rr},${cc}`)
-    r = rr
-    c = cc
+    visited.add(`${rr},${cc}`);
+    r = rr;
+    c = cc;
   }
 
   return visited.size;

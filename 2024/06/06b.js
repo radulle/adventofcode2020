@@ -22,8 +22,9 @@ function process(grid) {
     }
   }
 
-  let stuck = 0
+  let stuck = 0;
 
+  // TODO: Try using Workers
   for (let RR = 0; RR < grid.length; RR++) {
     main: for (let CC = 0; CC < grid[0].length; CC++) {
       if (grid[RR][CC] !== "#" && grid[RR][CC] !== "^") {
@@ -40,32 +41,37 @@ function process(grid) {
         const dc = [0, 1, 0, -1];
 
         while (true) {
-          const rr = r + dr[i]
-          const cc = c + dc[i]
+          const rr = r + dr[i];
+          const cc = c + dc[i];
 
           if (visited.has(`${rr},${cc},${i}`)) {
-            stuck++
-            grid[RR][CC] = "."
+            stuck++;
+            grid[RR][CC] = ".";
             continue main;
           }
 
-          if (!(rr >= 0 && rr < grid.length && cc >= 0 && cc < grid[0].length)) {
-            grid[RR][CC] = "."
+          if (
+            !(rr >= 0 && rr < grid.length && cc >= 0 && cc < grid[0].length)
+          ) {
+            grid[RR][CC] = ".";
             continue main;
           }
 
-          const vv = grid[rr][cc]
+          const vv = grid[rr][cc];
 
-          if (vv === '#' || vv === 'O') {
-            if (i < 3) { i++ } else { i = 0 }
-            continue
+          if (vv === "#" || vv === "O") {
+            if (i < 3) {
+              i++;
+            } else {
+              i = 0;
+            }
+            continue;
           }
 
-          visited.add(`${rr},${cc},${i}`)
-          r = rr
-          c = cc
+          visited.add(`${rr},${cc},${i}`);
+          r = rr;
+          c = cc;
         }
-
       }
     }
   }
