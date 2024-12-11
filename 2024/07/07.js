@@ -3,7 +3,7 @@ const { input, consoleTime } = require("lib");
 consoleTime(() => solve(input()));
 
 function solve(input) {
-  return [process(parse(input))];
+  return [process(parse(input), 0), process(parse(input), 1)];
 }
 
 function parse(input) {
@@ -15,8 +15,9 @@ function parse(input) {
   return equations;
 }
 
-function process(input) {
-  const ops = [(a, b) => a + b, (a, b) => a * b, (a, b) => +`${a}${b}`];
+function process(input, part) {
+  const ops = [(a, b) => a + b, (a, b) => a * b];
+  if (part) ops.push((a, b) => +`${a}${b}`);
   let sum = 0;
   for (const [target, source] of input) {
     let v = [source[0]];
@@ -30,7 +31,7 @@ function process(input) {
       }
       v = nv;
     }
-    if (v.includes(target)) sum += target
+    if (v.includes(target)) sum += target;
   }
 
   return sum;
