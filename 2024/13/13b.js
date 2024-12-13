@@ -20,7 +20,7 @@ function process(list) {
   let ans = 0;
   const priceA = 3;
   const priceB = 1;
-  const CORRECTION = 0;
+  const CORRECTION = 10_000_000_000_000;
   const DELTA = 0.001;
 
   for (const [ax, ay, bx, by, X, Y] of list) {
