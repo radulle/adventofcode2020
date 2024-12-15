@@ -8,16 +8,19 @@ function solve(input) {
 
 function parse(input) {
   let [grid, moves] = input.split("\n\n");
-  grid = grid.replaceAll("O", "[]");
-  grid = grid.replaceAll(".", "..");
-  grid = grid.replaceAll("#", "##");
-  grid = grid.replaceAll("@", "@.");
-  grid = grid.split("\n").map((row) => row.split(""));
+  grid = grid
+    .replaceAll("O", "[]")
+    .replaceAll(".", "..")
+    .replaceAll("#", "##")
+    .replaceAll("@", "@.")
+    .split("\n")
+    .map((row) => row.split(""));
   moves = moves.split("\n").join("").split("");
   return [grid, moves];
 }
 
 function process([grid, moves]) {
+  const d = { "^": [-1, 0], v: [1, 0], "<": [0, -1], ">": [0, 1] };
   let r, c;
 
   for (let i = 0; i < grid.length; i++) {
@@ -29,9 +32,6 @@ function process([grid, moves]) {
       }
     }
   }
-  // throw new Error("Not implemented");
-
-  const d = { "^": [-1, 0], v: [1, 0], "<": [0, -1], ">": [0, 1] };
 
   for (let i = 0; i < moves.length; i++) {
     const move = moves[i];
@@ -46,14 +46,13 @@ function process([grid, moves]) {
           j += 2;
           continue;
         }
-        for (let k = j; k > 1; k--) {
+        for (let k = j; k > 0; k--) {
           grid[r + dr * k][c + dc * k] =
             grid[r + dr * (k - 1)][c + dc * (k - 1)];
         }
         grid[r][c] = ".";
         r = r + dr;
         c = c + dc;
-        grid[r][c] = "@";
         break;
       }
     }
@@ -67,16 +66,14 @@ function process([grid, moves]) {
         const v = grid[rr][cc];
         if (grid[rr][cc] === "#") return false;
         if (v === ".") return true;
-        const dir = push(rr, cc);
-        const side = push(
-          rr,
-          cc + (v === "[" ? 1 : 0) + (v === "]" ? - 1 : 0)
+        return (
+          push(rr, cc) &&
+          push(rr, cc + (v === "[" ? 1 : 0) + (v === "]" ? -1 : 0))
         );
-        return dir && side;
       }
       const free = push(r, c);
       if (!free) continue;
-      shift.sort((a, b) => move === "^" ? a[0] - b[0] : b[0] - a[0]);
+      shift.sort((a, b) => (move === "^" ? a[0] - b[0] : b[0] - a[0]));
       for (const [sr, sc, v] of shift) {
         grid[sr + dr][sc + dc] = v;
         grid[sr][sc] = ".";
@@ -84,7 +81,6 @@ function process([grid, moves]) {
       r = r + dr;
       c = c + dc;
     }
-
   }
 
   let sum = 0;
@@ -98,6 +94,4 @@ function process([grid, moves]) {
   console.info(_grid, "\n");
 
   return sum;
-
-
 }
