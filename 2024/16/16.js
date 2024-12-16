@@ -28,20 +28,21 @@ function process(grid) {
     [-1, 0],
   ];
   const seen = new Set();
-  const q = [[[sr, sc, 0, `${sr},${sc}`]]];
+  const q = [[[sr, sc, 0, null]]];
   let steps = 0;
   let score = Infinity;
-  const paths = [];
+  const prevs = [];
 
   main: while (q.length) {
     const layer = q[steps];
     if (layer?.length) {
-      for (const [r, c, d, path] of layer) {
+      for (const prev of layer) {
+        const [r, c, d] = prev;
         seen.add(`${r},${c},${d}`);
 
         if (r === er && c === ec) {
           score = steps;
-          paths.push(path);
+          prevs.push(prev);
         }
 
         if (steps > score) break main;
@@ -56,7 +57,7 @@ function process(grid) {
           const nSteps = steps + 1 + (i !== d ? 1000 : 0);
           if (grid[rr][cc] !== "#" && !seen.has(key)) {
             q[nSteps] = q[nSteps] || [];
-            q[nSteps].push([rr, cc, i, `${path};${rr},${cc}`]);
+            q[nSteps].push([rr, cc, i, prev]);
           }
         }
       }
@@ -64,5 +65,12 @@ function process(grid) {
     steps++;
   }
 
-  return [score, new Set(paths.join(";").split(";")).size];
+  const all = new Set();
+  prevs.forEach(function getPrev(p) {
+    if (!p) return;
+    all.add(`${p[0]},${p[1]}`);
+    return getPrev(p[3]);
+  });
+
+  return [score, all.size];
 }
