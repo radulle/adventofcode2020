@@ -24,8 +24,8 @@ function process(grid) {
   const dirs = [
     [0, 1],
     [1, 0],
-    [-1, 0],
     [0, -1],
+    [-1, 0],
   ];
   const seen = new Set();
   const q = [[[sr, sc, 0, `${sr},${sc}`]]];
@@ -49,6 +49,7 @@ function process(grid) {
         let rr, cc, key;
 
         for (let i = 0; i < 4; i++) {
+          if (i === (d + 2) % 4) continue;
           rr = r + dirs[i][0];
           cc = c + dirs[i][1];
           key = `${rr},${cc},${i}`;
